@@ -1,6 +1,7 @@
+require('dotenv').config()
 const { Sequelize, DataTypes } = require('sequelize')
 
-const sequelize = new Sequelize('postgres://postgres:admin@192.168.0.9:5432/prueba')
+const sequelize = new Sequelize(process.env.DB_URI)
 
 const connectDB = async () => {
   try {
