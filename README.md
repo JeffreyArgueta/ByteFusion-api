@@ -18,7 +18,8 @@
 
     ```.env
     PORT=3000
-    DB_URL=postgres://user:pass@localhost:5432/prueba
+    DB_URI=postgres://user:pass@localhost:5432/database
+    FRONTEND_URI=http://localhost:3001
     ```
 
 ## ▶️ Ejecución

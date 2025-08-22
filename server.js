@@ -1,12 +1,20 @@
 require('dotenv').config()
 const express = require('express');
+const cors = require('cors');
 const routes = require('./src/routes');
-const { connectDB } = require('./src/config/database');
+const { connectDB, closeDB } = require('./src/config/database');
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cors({
+  origin: process.env.FRONTEND_URI,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.get('/', (req, res) => {
   res.json({
@@ -29,12 +37,28 @@ app.use((req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(process.env.PORT, () => {
-      console.info('🚀 Server running in PORT http://localhost:3000')
+    const server = app.listen(process.env.PORT, () => {
+      console.info(`🚀 Server running in http://localhost:${process.env.PORT}`)
       console.info(`📊 Process ID: ${process.pid}`);
     });
+    // Shutdown on SIGINT (Ctrl+C) and SIGTERM
+    process.on('SIGINT', async () => {
+      await closeDB();
+      server.close(() => {
+        console.info('🛑 Server closed succesfully');
+        process.exit(0);
+      });
+    });
+    process.on('SIGTERM', async () => {
+      await closeDB();
+      server.close(() => {
+        console.info('🛑 Server closed succesfully');
+        process.exit(0);
+      });
+    });
   } catch (error) {
-    console.error('Error starting server: ', error);
+    console.error('Error while starting server: ', error);
+    await closeDB();
     process.exit(1);
   }
 };

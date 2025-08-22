@@ -18,7 +18,7 @@ const createEmployee = async ({ name, email }) => {
       { name, email },
       { transaction }
     );
-    console.info(`Employee created succesfully: ${email}`, { employee_id: employee.id })
+    console.info(`Employee created succesfully with ID: ${employee.id}`, { employee: employee.id, email })
     await transaction.commit();
     return employee;
   } catch (error) {
@@ -61,8 +61,9 @@ const deleteEmployee = async (id) => {
       throw error;
     }
     await employee.destroy({ transaction });
-    console.info(`Employee deleted succesfully with ID: ${id}`, { employee: id, email })
+    console.info(`Employee deleted succesfully with ID: ${id}`, { employee_id: id })
     await transaction.commit();
+    return employee;
   } catch (error) {
     await transaction.rollback();
     console.error(`Error deleting employee with ID: ${id}`, { error: error.message });
